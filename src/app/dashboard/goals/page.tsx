@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Target, Trophy, Flame, Calendar, Clock, TrendingUp, Plus, CheckCircle, Circle, Star, Award, BookOpen } from 'lucide-react'
@@ -384,8 +383,8 @@ function GoalsContent() {
 
 export default function GoalsPage() {
   return (
-    <DashboardLayout>
+    
       <GoalsContent />
-    </DashboardLayout>
+    
   )
 }

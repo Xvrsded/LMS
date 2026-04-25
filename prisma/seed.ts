@@ -1,10 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('Start seeding...')
+  console.log('🌱 Starting database seeding...')
 
   // Create categories
   const programmingCategory = await prisma.category.upsert({
@@ -40,66 +39,73 @@ async function main() {
     }
   })
 
-  // Hash passwords
-  const adminPassword = await bcrypt.hash('password', 12)
-  const tutorPassword = await bcrypt.hash('password', 12)
-  const studentPassword = await bcrypt.hash('password', 12)
-
-  // Create users
+  // Create users with username and plain text passwords
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
+    where: { username: 'admin' },
     update: {},
     create: {
-      email: 'admin@example.com',
-      name: 'Admin User',
-      password: adminPassword,
-      role: 'ADMIN'
+      username: 'admin',
+      name: 'Administrator',
+      password: '123',
+      role: 'ADMIN',
+      bio: 'System administrator with full access to all features.'
     }
   })
 
   const tutorUser = await prisma.user.upsert({
-    where: { email: 'tutor@example.com' },
+    where: { username: 'tutor' },
     update: {},
     create: {
-      email: 'tutor@example.com',
+      username: 'tutor',
       name: 'John Tutor',
-      password: tutorPassword,
-      role: 'TUTOR'
+      password: '123',
+      role: 'TUTOR',
+      bio: 'Experienced tutor with expertise in various subjects.'
     }
   })
 
   const tutorUser2 = await prisma.user.upsert({
-    where: { email: 'jane@example.com' },
+    where: { username: 'jane' },
     update: {},
     create: {
-      email: 'jane@example.com',
+      username: 'jane',
       name: 'Jane Smith',
-      password: tutorPassword,
-      role: 'TUTOR'
+      password: '123',
+      role: 'TUTOR',
+      bio: 'UI/UX design specialist and creative professional.'
     }
   })
 
   const studentUser = await prisma.user.upsert({
-    where: { email: 'student@example.com' },
+    where: { username: 'siswa' },
     update: {},
     create: {
-      email: 'student@example.com',
+      username: 'siswa',
       name: 'Student User',
-      password: studentPassword,
-      role: 'STUDENT'
+      password: '123',
+      role: 'STUDENT',
+      bio: 'Eager learner ready to explore new courses.'
     }
   })
 
   const studentUser2 = await prisma.user.upsert({
-    where: { email: 'bob@example.com' },
+    where: { username: 'bob' },
     update: {},
     create: {
-      email: 'bob@example.com',
+      username: 'bob',
       name: 'Bob Johnson',
-      password: studentPassword,
-      role: 'STUDENT'
+      password: '123',
+      role: 'STUDENT',
+      bio: 'Programming enthusiast and web development student.'
     }
   })
+
+  console.log('✅ Created default users:')
+  console.log('   admin / 123 (Administrator)')
+  console.log('   tutor / 123 (Tutor)')
+  console.log('   jane / 123 (Tutor)')
+  console.log('   siswa / 123 (Student)')
+  console.log('   bob / 123 (Student)')
 
   // Create courses
   const webDevCourse = await prisma.course.create({

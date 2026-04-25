@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/tables/data-table'
 import { DashboardChart } from '@/components/charts/dashboard-chart'
@@ -130,8 +129,8 @@ const reportMetrics = [
 ]
 
 function ReportsContent() {
-  const { data: session } = useSession()
-  const userRole = session?.user?.role || 'STUDENT'
+  const { user } = useAuth()
+  const userRole = user?.role || 'STUDENT'
   const [reports, setReports] = useState(mockReports)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
@@ -580,8 +579,8 @@ function ReportsContent() {
 
 export default function ReportsPage() {
   return (
-    <DashboardLayout>
+    
       <ReportsContent />
-    </DashboardLayout>
+    
   )
 }

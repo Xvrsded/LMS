@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Award, Download, Share2, Calendar, CheckCircle, Clock, ExternalLink, Filter, Search } from 'lucide-react'
@@ -366,8 +365,8 @@ function CertificatesContent() {
 
 export default function CertificatesPage() {
   return (
-    <DashboardLayout>
+    
       <CertificatesContent />
-    </DashboardLayout>
+    
   )
 }

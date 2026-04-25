@@ -1,429 +1,419 @@
 'use client'
 
-import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useState } from 'react'
+import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, Search, Filter, ThumbsUp, MessageCircle, Share2, Bookmark, Plus, Clock, Eye, User, TrendingUp, Pin } from 'lucide-react'
+import { LoadingCard, LoadingTable } from '@/components/ui/loading'
+import { EmptyDiscussions, EmptySearch } from '@/components/ui/empty-state'
+import { 
+  MessageSquare, 
+  Reply, 
+  Search, 
+  Filter, 
+  Clock, 
+  CheckCircle,
+  AlertCircle,
+  User,
+  BookOpen,
+  Send,
+  MoreVertical
+} from 'lucide-react'
 
-const discussionsData = [
+interface Discussion {
+  id: string
+  student: string
+  course: string
+  question: string
+  timestamp: string
+  status: 'answered' | 'pending' | 'urgent'
+  replies: number
+  lastReply?: string
+}
+
+const discussions: Discussion[] = [
   {
     id: '1',
-    title: 'Best practices for React Hooks in large applications',
-    content: 'I\'ve been working on a large React application and I\'m wondering about the best practices for using React Hooks. Should I use custom hooks for everything? What about performance optimization?',
-    author: 'John Doe',
-    authorAvatar: '/api/placeholder/40/40',
-    courseTitle: 'Complete Web Development Bootcamp',
-    category: 'React Hooks',
-    tags: ['react', 'hooks', 'performance'],
-    createdAt: '2024-03-14T10:30:00',
-    replies: 23,
-    views: 156,
-    likes: 45,
-    isPinned: true,
-    isLocked: false,
-    isBookmarked: true,
-    hasAnswer: true,
-    lastReply: '2024-03-14T15:45:00',
-    lastReplyAuthor: 'Jane Smith'
+    student: 'John Doe',
+    course: 'JavaScript Fundamentals',
+    question: 'I\'m having trouble understanding closures in JavaScript. Can you explain it with a practical example?',
+    timestamp: '2 hours ago',
+    status: 'pending',
+    replies: 2,
+    lastReply: '30 minutes ago'
   },
   {
     id: '2',
-    title: 'How to create responsive layouts with CSS Grid?',
-    content: 'I\'m struggling with creating responsive layouts using CSS Grid. Can someone explain the best approach for mobile-first design?',
-    author: 'Alice Brown',
-    authorAvatar: '/api/placeholder/40/40',
-    courseTitle: 'Complete Web Development Bootcamp',
-    category: 'CSS',
-    tags: ['css', 'grid', 'responsive'],
-    createdAt: '2024-03-14T09:15:00',
-    replies: 18,
-    views: 234,
-    likes: 32,
-    isPinned: false,
-    isLocked: false,
-    isBookmarked: false,
-    hasAnswer: true,
-    lastReply: '2024-03-14T14:20:00',
-    lastReplyAuthor: 'Bob Johnson'
+    student: 'Jane Smith',
+    course: 'React Advanced Patterns',
+    question: 'How do I properly implement React Context with TypeScript? Getting type errors.',
+    timestamp: '5 hours ago',
+    status: 'answered',
+    replies: 4,
+    lastReply: '1 hour ago'
   },
   {
     id: '3',
-    title: 'JavaScript async/await vs Promises - when to use which?',
-    content: 'I understand both async/await and Promises, but I\'m not sure when to use one over the other. What are the pros and cons of each approach?',
-    author: 'Charlie Wilson',
-    authorAvatar: '/api/placeholder/40/40',
-    courseTitle: 'Complete Web Development Bootcamp',
-    category: 'JavaScript',
-    tags: ['javascript', 'async', 'promises'],
-    createdAt: '2024-03-13T16:45:00',
-    replies: 31,
-    views: 412,
-    likes: 67,
-    isPinned: false,
-    isLocked: false,
-    isBookmarked: true,
-    hasAnswer: true,
-    lastReply: '2024-03-14T11:30:00',
-    lastReplyAuthor: 'David Lee'
+    student: 'Mike Johnson',
+    course: 'TypeScript Basics',
+    question: 'Urgent: My project build is failing due to TypeScript errors. Need help ASAP!',
+    timestamp: '1 hour ago',
+    status: 'urgent',
+    replies: 1,
+    lastReply: '45 minutes ago'
   },
   {
     id: '4',
-    title: 'UI/UX Design principles for mobile apps',
-    content: 'What are the key differences between designing for web vs mobile? Are there specific guidelines I should follow for mobile app design?',
-    author: 'Emma Davis',
-    authorAvatar: '/api/placeholder/40/40',
-    courseTitle: 'UI/UX Design Masterclass',
-    category: 'Mobile Design',
-    tags: ['ui', 'ux', 'mobile', 'design'],
-    createdAt: '2024-03-13T14:20:00',
-    replies: 15,
-    views: 189,
-    likes: 28,
-    isPinned: false,
-    isLocked: false,
-    isBookmarked: false,
-    hasAnswer: false,
-    lastReply: '2024-03-14T09:15:00',
-    lastReplyAuthor: 'Frank Miller'
+    student: 'Sarah Wilson',
+    course: 'Node.js Backend',
+    question: 'What\'s the best way to handle authentication in a Node.js API?',
+    timestamp: '1 day ago',
+    status: 'answered',
+    replies: 6,
+    lastReply: '3 hours ago'
+  },
+  {
+    id: '5',
+    student: 'Tom Brown',
+    course: 'CSS Mastery',
+    question: 'How can I create responsive layouts without using media queries?',
+    timestamp: '2 days ago',
+    status: 'pending',
+    replies: 0
   }
 ]
 
-const categories = [
-  { name: 'All Categories', count: 156 },
-  { name: 'React Hooks', count: 23 },
-  { name: 'CSS', count: 18 },
-  { name: 'JavaScript', count: 31 },
-  { name: 'Mobile Design', count: 15 },
-  { name: 'General', count: 69 }
-]
-
-function DiscussionsContent() {
+function DiscussionContent() {
+  const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All Categories')
-  const [sortBy, setSortBy] = useState('latest')
-  const [activeTab, setActiveTab] = useState<'all' | 'my' | 'bookmarked'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'answered' | 'urgent'>('all')
+  const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null)
+  const [replyText, setReplyText] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredDiscussions = discussionsData.filter(discussion => {
-    const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         discussion.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesCategory = selectedCategory === 'All Categories' || discussion.category === selectedCategory
-    const matchesTab = activeTab === 'all' || 
-                     (activeTab === 'my' && discussion.author === 'John Doe') ||
-                     (activeTab === 'bookmarked' && discussion.isBookmarked)
-    return matchesSearch && matchesCategory && matchesTab
+  // Simulate loading state
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 700)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {/* Loading Header */}
+        <LoadingCard title="Discussion" lines={2} />
+        
+        {/* Loading Discussions List */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+          <div className="xl:col-span-2 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <LoadingCard key={i} lines={4} />
+            ))}
+          </div>
+          
+          {/* Loading Discussion Detail */}
+          <div className="xl:col-span-1">
+            <LoadingCard lines={6} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const filteredDiscussions = discussions.filter(discussion => {
+    const matchesSearch = discussion.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          discussion.student.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          discussion.course.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || discussion.status === statusFilter
+    return matchesSearch && matchesStatus
   })
 
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    
-    if (diffInHours < 1) return 'Just now'
-    if (diffInHours < 24) return `${diffInHours}h ago`
-    if (diffInHours < 48) return 'Yesterday'
-    return `${Math.floor(diffInHours / 24)}d ago`
+  // Check if there are no discussions
+  const hasNoDiscussions = discussions.length === 0
+  const hasSearchResults = filteredDiscussions.length === 0 && searchTerm
+  
+  if (hasNoDiscussions) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Discussion</h1>
+              <p className="text-gray-600 mt-1">Manage student questions and course discussions</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                {['all', 'pending', 'answered', 'urgent'].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setStatusFilter(filter as any)}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 capitalize ${
+                      statusFilter === filter
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Search Bar */}
+          <div className="mt-4">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search discussions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Empty Discussions State */}
+        <EmptyDiscussions onCreateDiscussion={() => console.log('Create discussion')} />
+      </div>
+    )
   }
 
-  const handleLike = (discussionId: string) => {
-    alert(`Liking discussion ${discussionId}...`)
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'answered':
+        return <CheckCircle className="w-4 h-4 text-green-600" />
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-600" />
+      case 'urgent':
+        return <AlertCircle className="w-4 h-4 text-red-600" />
+      default:
+        return <MessageSquare className="w-4 h-4 text-gray-600" />
+    }
   }
 
-  const handleBookmark = (discussionId: string) => {
-    alert(`Bookmarking discussion ${discussionId}...`)
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      answered: 'bg-green-100 text-green-800',
+      pending: 'bg-yellow-100 text-yellow-800',
+      urgent: 'bg-red-100 text-red-800'
+    }
+    return (
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig[status as keyof typeof statusConfig]}`}>
+        {status}
+      </span>
+    )
   }
 
-  const handleShare = (discussionId: string) => {
-    alert(`Sharing discussion ${discussionId}...`)
+  const handleReply = () => {
+    if (replyText.trim() && selectedDiscussion) {
+      // Handle reply logic here
+      console.log('Reply sent:', replyText)
+      setReplyText('')
+    }
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-primary-900">Discussion Forum</h1>
-          <p className="text-secondary-600 mt-2">Connect with fellow learners and share knowledge</p>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Discussion</h1>
+            <p className="text-gray-600 mt-1">Manage student questions and course discussions</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              {['all', 'pending', 'answered', 'urgent'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setStatusFilter(filter as any)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 capitalize ${
+                    statusFilter === filter
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <Button className="bg-primary-800 hover:bg-primary-900">
-          <Plus className="w-4 h-4 mr-2" />
-          New Discussion
-        </Button>
+        
+        {/* Search Bar */}
+        <div className="mt-4">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search discussions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Discussions</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">156</p>
-                <p className="text-sm text-green-600 mt-1">+12 this week</p>
-              </div>
-              <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
-                <MessageSquare className="w-6 h-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">My Discussions</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">8</p>
-                <p className="text-sm text-blue-600 mt-1">2 active</p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-xl text-green-600">
-                <User className="w-6 h-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Bookmarked</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">12</p>
-                <p className="text-sm text-purple-600 mt-1">Following</p>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-xl text-purple-600">
-                <Bookmark className="w-6 h-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Contributions</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">45</p>
-                <p className="text-sm text-orange-600 mt-1">Helpful answers</p>
-              </div>
-              <div className="p-3 bg-orange-50 rounded-xl text-orange-600">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Categories */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <button
-                    key={category.name}
-                    onClick={() => setSelectedCategory(category.name)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
-                      selectedCategory === category.name
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="text-sm font-medium">{category.name}</span>
-                    <span className="text-sm text-gray-500">{category.count}</span>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Popular Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Popular Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {['react', 'javascript', 'css', 'html', 'nodejs', 'python', 'design', 'mobile'].map((tag) => (
-                  <button
-                    key={tag}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors"
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Tabs and Controls */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  {[
-                    { id: 'all', label: 'All Discussions', count: discussionsData.length },
-                    { id: 'my', label: 'My Discussions', count: 1 },
-                    { id: 'bookmarked', label: 'Bookmarked', count: 2 }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        activeTab === tab.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      {tab.label} ({tab.count})
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search discussions..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                    />
-                  </div>
-                  
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  >
-                    <option value="latest">Latest</option>
-                    <option value="popular">Most Popular</option>
-                    <option value="unanswered">Unanswered</option>
-                  </select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Discussions List */}
-          <div className="space-y-4">
-            {filteredDiscussions.map((discussion) => (
-              <Card key={discussion.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4 flex-1">
-                      {/* Author Avatar */}
-                      <div className="w-10 h-10 bg-gray-200 rounded-full shrink-0"></div>
-                      
-                      {/* Discussion Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-2">
-                          {discussion.isPinned && (
-                            <Pin className="w-4 h-4 text-red-500" />
-                          )}
-                          <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer">
-                            {discussion.title}
-                          </h3>
-                          {discussion.hasAnswer && (
-                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                              Answered
-                            </span>
-                          )}
-                        </div>
-                        
-                        <p className="text-gray-600 mb-3 line-clamp-2">{discussion.content}</p>
-                        
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                          <span className="font-medium text-gray-700">{discussion.author}</span>
-                          <span>•</span>
-                          <span>{discussion.courseTitle}</span>
-                          <span>•</span>
-                          <span>{formatTimeAgo(discussion.createdAt)}</span>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <MessageCircle className="w-4 h-4" />
-                            <span>{discussion.replies} replies</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Eye className="w-4 h-4" />
-                            <span>{discussion.views} views</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>Last reply by {discussion.lastReplyAuthor}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {discussion.tags.map((tag, index) => (
-                            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+        {/* Discussions List */}
+        <div className="xl:col-span-2 space-y-4">
+          {hasSearchResults ? (
+            <EmptySearch 
+              query={searchTerm} 
+              onClearSearch={() => setSearchTerm('')} 
+            />
+          ) : (
+            filteredDiscussions.map((discussion) => (
+              <div 
+                key={discussion.id}
+                onClick={() => setSelectedDiscussion(discussion)}
+                className={`bg-white p-4 rounded-2xl shadow-sm border cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative overflow-hidden ${
+                  selectedDiscussion?.id === discussion.id 
+                    ? 'border-blue-500 bg-blue-50 shadow-lg' 
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+              >
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-linear-to-br from-blue-50/30 via-purple-50/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="group-hover:scale-110 transition-transform duration-200">
+                        {getStatusIcon(discussion.status)}
+                      </div>
+                      <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200">{discussion.student}</span>
+                      <div className="group-hover:scale-105 transition-transform duration-200">
+                        {getStatusBadge(discussion.status)}
                       </div>
                     </div>
-                    
-                    {/* Actions */}
-                    <div className="flex items-center space-x-2 ml-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(discussion.id)}
-                        className="flex items-center space-x-1"
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                        <span>{discussion.likes}</span>
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleBookmark(discussion.id)}
-                        className={discussion.isBookmarked ? 'text-blue-600' : ''}
-                      >
-                        <Bookmark className={`w-4 h-4 ${discussion.isBookmarked ? 'fill-current' : ''}`} />
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleShare(discussion.id)}
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 group-hover:text-gray-600 transition-colors duration-200">{discussion.timestamp}</span>
+                      <button className="p-1 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-110 group-hover:bg-blue-100">
+                        <MoreVertical className="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors duration-200" />
+                      </button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  
+                  <div className="mb-3">
+                    <p className="text-sm text-gray-600 mb-1 group-hover:text-gray-700 transition-colors duration-200">{discussion.course}</p>
+                    <p className="text-gray-900 line-clamp-2 group-hover:text-gray-800 transition-colors duration-200">{discussion.question}</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-1 group-hover:scale-105 transition-transform duration-200">
+                        <Reply className="w-3 h-3 group-hover:text-blue-600 transition-colors duration-200" />
+                        <span className="group-hover:text-gray-700 transition-colors duration-200">{discussion.replies} replies</span>
+                      </div>
+                      {discussion.lastReply && (
+                        <span className="group-hover:text-gray-700 transition-colors duration-200">Last reply {discussion.lastReply}</span>
+                      )}
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedDiscussion(discussion)
+                      }}
+                      className="hover:bg-blue-600 hover:text-white hover:border-blue-600 hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 group-hover:scale-105"
+                    >
+                      View Thread
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
-          {filteredDiscussions.length === 0 && (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No discussions found</h3>
-                <p className="text-gray-500 mb-4">Start a new discussion or try different filters</p>
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Start Discussion
-                </Button>
-              </CardContent>
-            </Card>
+        {/* Discussion Detail */}
+        <div className="xl:col-span-1">
+          {selectedDiscussion ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center gap-2 mb-2">
+                  {getStatusIcon(selectedDiscussion.status)}
+                  <span className="font-medium text-gray-900">{selectedDiscussion.student}</span>
+                  {getStatusBadge(selectedDiscussion.status)}
+                </div>
+                <p className="text-sm text-gray-600">{selectedDiscussion.course}</p>
+                <p className="text-xs text-gray-500 mt-1">{selectedDiscussion.timestamp}</p>
+              </div>
+              
+              <div className="p-4">
+                <h4 className="font-medium text-gray-900 mb-3">Question</h4>
+                <p className="text-gray-700 text-sm mb-4">{selectedDiscussion.question}</p>
+                
+                {/* Sample Replies */}
+                <div className="space-y-3 mb-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                        <User className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">You</span>
+                      <span className="text-xs text-gray-500">30 minutes ago</span>
+                    </div>
+                    <p className="text-sm text-gray-700">
+                      Great question! Let me explain closures with a practical example...
+                    </p>
+                  </div>
+                  
+                  {selectedDiscussion.replies > 1 && (
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                          <span className="text-xs text-white font-medium">JD</span>
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">{selectedDiscussion.student}</span>
+                        <span className="text-xs text-gray-500">15 minutes ago</span>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        Thanks! That makes much more sense now.
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Reply Input */}
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Type your reply..."
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleReply()}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 text-sm"
+                    />
+                    <Button 
+                      size="sm" 
+                      onClick={handleReply}
+                      disabled={!replyText.trim()}
+                      className="px-3"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+              <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Discussion</h3>
+              <p className="text-sm text-gray-600">
+                Choose a discussion from the list to view details and reply.
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -431,10 +421,10 @@ function DiscussionsContent() {
   )
 }
 
-export default function DiscussionsPage() {
+export default function Discussion() {
   return (
-    <DashboardLayout>
-      <DiscussionsContent />
-    </DashboardLayout>
+    
+      <DiscussionContent />
+    
   )
 }

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { User, Lock, Bell, Eye, EyeOff, Save, Shield, Globe, LogOut, AlertTriangle, Camera, CreditCard, Receipt } from 'lucide-react'
@@ -572,8 +571,8 @@ function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <DashboardLayout>
+    
       <SettingsContent />
-    </DashboardLayout>
+    
   )
 }

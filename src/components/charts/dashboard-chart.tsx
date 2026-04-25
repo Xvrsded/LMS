@@ -3,21 +3,21 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
 const lineChartData = [
-  { name: 'Mon', students: 120, courses: 45 },
-  { name: 'Tue', students: 132, courses: 52 },
-  { name: 'Wed', students: 125, courses: 48 },
-  { name: 'Thu', students: 145, courses: 58 },
-  { name: 'Fri', students: 160, courses: 65 },
-  { name: 'Sat', students: 140, courses: 55 },
-  { name: 'Sun', students: 130, courses: 50 },
+  { name: 'Mon', enrollment: 120, completion: 78 },
+  { name: 'Tue', enrollment: 132, completion: 82 },
+  { name: 'Wed', enrollment: 125, completion: 80 },
+  { name: 'Thu', enrollment: 145, completion: 85 },
+  { name: 'Fri', enrollment: 160, completion: 88 },
+  { name: 'Sat', enrollment: 140, completion: 83 },
+  { name: 'Sun', enrollment: 130, completion: 81 },
 ]
 
 const barChartData = [
-  { name: 'JavaScript', students: 89, completion: 78 },
-  { name: 'React', students: 76, completion: 82 },
-  { name: 'TypeScript', students: 65, completion: 71 },
+  { name: 'JavaScript', students: 89, completion: 85 },
+  { name: 'React', students: 76, completion: 78 },
+  { name: 'TypeScript', students: 65, completion: 72 },
   { name: 'Node.js', students: 54, completion: 68 },
-  { name: 'CSS', students: 92, completion: 85 },
+  { name: 'CSS', students: 92, completion: 90 },
 ]
 
 interface DashboardChartProps {
@@ -30,11 +30,24 @@ export function DashboardChart({ userRole = 'STUDENT' }: DashboardChartProps) {
       case 'ADMIN':
         return 'Weekly Overview'
       case 'TUTOR':
-        return 'Student Engagement'
+        return 'Teaching Performance'
       case 'STUDENT':
         return 'Learning Progress'
       default:
         return 'Activity Overview'
+    }
+  }
+
+  const getBarChartTitle = () => {
+    switch (userRole) {
+      case 'ADMIN':
+        return 'Course Performance'
+      case 'TUTOR':
+        return 'Course Completion Rates'
+      case 'STUDENT':
+        return 'Course Progress'
+      default:
+        return 'Performance Overview'
     }
   }
 
@@ -80,7 +93,7 @@ export function DashboardChart({ userRole = 'STUDENT' }: DashboardChartProps) {
             />
             <Line 
               type="monotone" 
-              dataKey="students" 
+              dataKey="enrollment" 
               stroke="#3b82f6" 
               strokeWidth={2}
               dot={{ fill: '#3b82f6', r: 4 }}
@@ -88,7 +101,7 @@ export function DashboardChart({ userRole = 'STUDENT' }: DashboardChartProps) {
             />
             <Line 
               type="monotone" 
-              dataKey="courses" 
+              dataKey="completion" 
               stroke="#10b981" 
               strokeWidth={2}
               dot={{ fill: '#10b981', r: 4 }}
@@ -101,7 +114,7 @@ export function DashboardChart({ userRole = 'STUDENT' }: DashboardChartProps) {
       {/* Bar Chart */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Popular Courses</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{getBarChartTitle()}</h3>
           <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
             View All
           </button>

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Users, Search, Filter, MoreHorizontal, Edit, Trash2, Shield } from 'lucide-react'
@@ -230,8 +229,8 @@ function UsersContent() {
 
 export default function UsersPage() {
   return (
-    <DashboardLayout>
+    
       <UsersContent />
-    </DashboardLayout>
+    
   )
 }

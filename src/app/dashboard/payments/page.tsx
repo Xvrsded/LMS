@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CreditCard, Search, Filter, Download, Receipt, CheckCircle, Clock, AlertCircle, Calendar, TrendingUp } from 'lucide-react'
@@ -362,8 +361,8 @@ function PaymentsContent() {
 
 export default function PaymentsPage() {
   return (
-    <DashboardLayout>
+    
       <PaymentsContent />
-    </DashboardLayout>
+    
   )
 }

@@ -1,28 +1,34 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { signOut, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Bell, Search, User, LogOut, Sun, Moon, Settings, HelpCircle, ChevronDown, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/contexts/theme-context'
+import { useAuth } from '@/contexts/auth-context'
 
 interface HeaderProps {
   className?: string
+  onMenuClick?: () => void
+  onSidebarToggle?: () => void
+  isSidebarOpen?: boolean
 }
 
-export function Header({ className }: HeaderProps) {
-  const { data: session } = useSession()
+export function Header({ className, onMenuClick, onSidebarToggle, isSidebarOpen = true }: HeaderProps) {
+  const { user, logout } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const handleSignOut = async () => {
     try {
-      await signOut({ callbackUrl: '/' })
+      logout()
+      router.push('/auth/signin')
     } catch (error) {
       console.error('Error signing out:', error)
     }
@@ -44,29 +50,44 @@ export function Header({ className }: HeaderProps) {
 
   return (
     <header className={cn(
-      "h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 shadow-sm sticky top-0 z-40 transition-colors duration-200",
+      "w-full h-full bg-white flex items-center justify-between transition-colors duration-200",
       className
     )}>
       <div className="flex items-center justify-between w-full">
-        {/* Mobile Menu Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden mr-2"
-        >
-          <Menu className="w-5 h-5" />
-        </Button>
-        
-        {/* Search Bar */}
-        <div className="flex-1 max-w-xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search courses, students, or anything..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-200"
-            />
+        {/* Left Side - Menu Toggle & Search */}
+        <div className="flex items-center flex-1">
+          {/* Desktop Sidebar Toggle */}
+          {onSidebarToggle && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onSidebarToggle}
+              className="hidden lg:flex mr-3 hover:bg-gray-100 hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 group"
+            >
+              <Menu className={`w-5 h-5 transition-transform duration-300 ${isSidebarOpen ? 'rotate-180' : ''} group-hover:scale-110`} />
+            </Button>
+          )}
+          
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            className="lg:hidden mr-2 hover:bg-gray-100 hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 group"
+          >
+            <Menu className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </Button>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-xl">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 group-hover:text-blue-600 group-hover:scale-110 transition-all duration-200" />
+              <input
+                type="text"
+                placeholder="Search courses, students, or anything..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all duration-300 bg-gray-50 hover:bg-white hover:shadow-md hover:border-gray-400 focus:bg-white focus:shadow-lg"
+              />
+            </div>
           </div>
         </div>
 
@@ -77,13 +98,12 @@ export function Header({ className }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={toggleDarkMode}
-            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
-            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            className="hover:bg-gray-100 hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 group"
           >
             {darkMode ? (
-              <Sun className="w-5 h-5" />
+              <Sun className="w-5 h-5 text-gray-600 group-hover:text-yellow-600 group-hover:rotate-45 transition-all duration-300" />
             ) : (
-              <Moon className="w-5 h-5" />
+              <Moon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 group-hover:scale-110 transition-all duration-300" />
             )}
           </Button>
 
@@ -92,20 +112,20 @@ export function Header({ className }: HeaderProps) {
             <Button
               variant="ghost"
               size="icon"
+              className="hover:bg-gray-100 hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-200 relative group"
               onClick={() => setShowNotifications(!showNotifications)}
-              className="text-gray-600 hover:text-gray-900 relative"
             >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <Bell className="w-5 h-5 text-gray-600 group-hover:text-blue-600 group-hover:scale-110 transition-all duration-300" />
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 transition-all duration-200">3</span>
             </Button>
             
             {/* Notifications Dropdown */}
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 backdrop-blur-sm">
-                <div className="px-4 py-2 border-b border-gray-200">
+                <div className="px-4 py-3 border-b border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
                 </div>
-                <div className="max-h-64 overflow-y-auto">
+                <div className="max-h-96 overflow-y-auto">
                   <div className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors duration-200">
                     <p className="text-sm font-medium text-gray-900">New course available</p>
                     <p className="text-xs text-gray-600">React Advanced Patterns • 2h ago</p>
@@ -131,8 +151,8 @@ export function Header({ className }: HeaderProps) {
           {/* User Menu */}
           <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{session?.user?.name || 'User'}</p>
-              <p className="text-xs text-gray-500">{session?.user?.role === 'ADMIN' ? 'Admin' : session?.user?.role === 'TUTOR' ? 'Instructor' : 'Student'}</p>
+              <p className="text-sm font-medium text-gray-900">{user?.name || user?.username || 'User'}</p>
+              <p className="text-xs text-gray-500">{user?.role === 'ADMIN' ? 'Admin' : user?.role === 'TUTOR' ? 'Instructor' : 'Student'}</p>
             </div>
             <Button
               variant="ghost"
@@ -141,7 +161,7 @@ export function Header({ className }: HeaderProps) {
               className="relative"
             >
               <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                {session?.user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                {(user?.name || user?.username || 'U').charAt(0).toUpperCase()}
               </div>
               <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${
                   showUserMenu ? 'rotate-180' : ''
@@ -153,10 +173,10 @@ export function Header({ className }: HeaderProps) {
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 backdrop-blur-sm">
                 <div className="px-4 py-3 border-b border-gray-200">
                   <p className="text-sm font-medium text-gray-900">
-                    {session?.user?.name || 'User'}
+                    {user?.name || user?.username || 'User'}
                   </p>
                   <p className="text-xs text-gray-600">
-                    {session?.user?.email || 'user@example.com'}
+                    {user?.username || 'user@example.com'}
                   </p>
                 </div>
                   

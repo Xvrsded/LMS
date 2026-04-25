@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookMarked, Search, Filter, Clock, Play, ExternalLink, Trash2, Folder, Plus, BookmarkIcon, Video, FileText, MessageSquare } from 'lucide-react'
@@ -442,8 +441,8 @@ function BookmarksContent() {
 
 export default function BookmarksPage() {
   return (
-    <DashboardLayout>
+    
       <BookmarksContent />
-    </DashboardLayout>
+    
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { HelpCircle, Search, MessageSquare, Phone, Mail, BookOpen, Video, FileText, ExternalLink, Clock, CheckCircle, AlertCircle, Plus, Send } from 'lucide-react'
@@ -471,8 +470,8 @@ function HelpContent() {
 
 export default function HelpPage() {
   return (
-    <DashboardLayout>
+    
       <HelpContent />
-    </DashboardLayout>
+    
   )
 }

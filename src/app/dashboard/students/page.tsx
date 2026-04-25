@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
+import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/tables/data-table'
 import { StudentDetailModal } from '@/components/modals/student-detail-modal'
@@ -134,7 +133,7 @@ const recentActivities = [
 ]
 
 function StudentsContent() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const [students, setStudents] = useState(mockStudents)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -452,8 +451,8 @@ function StudentsContent() {
 
 export default function StudentsPage() {
   return (
-    <DashboardLayout>
+    
       <StudentsContent />
-    </DashboardLayout>
+    
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar, Clock, Video, MapPin, Users, ChevronLeft, ChevronRight, Plus, Filter, Bell } from 'lucide-react'
@@ -408,8 +407,8 @@ function ScheduleContent() {
 
 export default function SchedulePage() {
   return (
-    <DashboardLayout>
+    
       <ScheduleContent />
-    </DashboardLayout>
+    
   )
 }

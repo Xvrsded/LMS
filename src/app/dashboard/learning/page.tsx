@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookOpen, Play, Clock, CheckCircle, Circle, Award, TrendingUp, Calendar, BarChart3, Download } from 'lucide-react'
@@ -343,8 +342,8 @@ function LearningContent() {
 
 export default function LearningPage() {
   return (
-    <DashboardLayout>
+    
       <LearningContent />
-    </DashboardLayout>
+    
   )
 }

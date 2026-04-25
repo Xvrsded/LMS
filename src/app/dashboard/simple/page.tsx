@@ -1,10 +1,9 @@
 'use client'
 
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
 
 export default function SimpleDashboard() {
   return (
-    <DashboardLayout>
+    
       <div className="space-y-6">
         {/* Simple Test Header */}
         <div className="bg-white p-6 rounded-xl shadow-brown border border-secondary-200">
@@ -45,6 +44,6 @@ export default function SimpleDashboard() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    
   )
 }
