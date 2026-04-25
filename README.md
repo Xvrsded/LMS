@@ -1,3 +1,42 @@
+# LMS Platform
+
+Learning Management System built with Next.js, Prisma, and PostgreSQL.
+
+## Features
+
+- 🎓 Role-based access (Admin, Tutor, Student)
+- 📚 Course management with modules and lessons
+- 📝 Quiz and assessment system
+- 💳 Payment integration
+- 📊 Analytics dashboard
+- 🔐 Authentication system
+
+## Demo Accounts
+
+- **Admin**: admin/123
+- **Tutor**: tutor/123
+- **Student**: siswa/123
+
+## Tech Stack
+
+- Next.js 16.2.4
+- Prisma ORM
+- PostgreSQL (Neon)
+- Tailwind CSS
+- TypeScript
+
+## Deployment
+
+This application is deployed on Vercel.
+
+## Environment Variables
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `NEXTAUTH_URL`: Application URL
+- `NEXTAUTH_SECRET`: Secret key for authentication
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
