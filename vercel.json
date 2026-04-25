@@ -3,32 +3,5 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["sin1"],
-  "env": {
-    "NEXTAUTH_URL": {
-      "description": "The URL of your deployed application",
-      "value": "https://your-domain.vercel.app"
-    },
-    "NEXTAUTH_SECRET": {
-      "description": "A secret key for NextAuth.js",
-      "generator": "secret"
-    },
-    "DATABASE_URL": {
-      "description": "PostgreSQL database connection string",
-      "value": "postgresql://neondb_owner:password@ep-xxx-aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-    }
-  },
-  "build": {
-    "env": {
-      "NEXTAUTH_URL": {
-        "description": "The URL of your deployed application"
-      },
-      "NEXTAUTH_SECRET": {
-        "description": "A secret key for NextAuth.js"
-      },
-      "DATABASE_URL": {
-        "description": "PostgreSQL database connection string"
-      }
-    }
-  }
+  "regions": ["sin1"]
 }
