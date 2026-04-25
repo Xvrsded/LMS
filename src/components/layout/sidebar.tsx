@@ -104,7 +104,7 @@ export function Sidebar({ userRole = 'STUDENT', onCloseMobile, isCollapsed = fal
       <div className="flex items-center justify-between p-6 border-b border-gray-100">
         {!collapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -114,7 +114,7 @@ export function Sidebar({ userRole = 'STUDENT', onCloseMobile, isCollapsed = fal
           </div>
         )}
         {collapsed && (
-          <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg mx-auto">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg mx-auto">
             <GraduationCap className="w-6 h-6 text-white" />
           </div>
         )}
@@ -132,12 +132,12 @@ export function Sidebar({ userRole = 'STUDENT', onCloseMobile, isCollapsed = fal
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden group",
                 isActive 
-                  ? "bg-linear-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02]" 
+                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02]" 
                   : "hover:bg-gray-50 hover:text-gray-900"
               )}
             >
               {isActive && (
-                <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-blue-700 opacity-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-10"></div>
               )}
               <item.icon className={cn(
                 "w-5 h-5 shrink-0 transition-colors duration-200 relative z-10",
@@ -157,7 +157,7 @@ export function Sidebar({ userRole = 'STUDENT', onCloseMobile, isCollapsed = fal
       {/* Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-gray-100">
-          <div className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
             <p className="text-sm font-medium text-gray-900 mb-1">Butuh Bantuan?</p>
             <p className="text-xs text-gray-600">Cek dokumentasi kami</p>
           </div>

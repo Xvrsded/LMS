@@ -64,7 +64,7 @@ export function Navbar({ onToggleSidebar, isSidebarOpen }: NavbarProps) {
               onClick={() => setShowProfileMenu(!showProfileMenu)}
               className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <div className="h-7 w-7 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
+              <div className="h-7 w-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
                 <span className="text-xs font-medium text-white leading-none">
                   {user?.name?.charAt(0) || user?.username?.charAt(0) || 'U'}
                 </span>
